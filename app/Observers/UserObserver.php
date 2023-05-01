@@ -11,8 +11,6 @@ class UserObserver
 
     public function creating(User $user)
     {
-//        dd($user);
         $user->generateNewUsername();
-        $user->remember_token = Str::random(10);
     }
 }
