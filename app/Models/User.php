@@ -81,7 +81,7 @@ class User extends Authenticatable
     protected function fullname(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->prefixname->value . ' ' . $this->firstname . ' ' .
+            get: fn () => $this->prefixname->value . '. ' . $this->firstname . ' ' .
                 $this->middlename . ' ' . $this->lastname . ' ' . $this->suffixname
         );
     }

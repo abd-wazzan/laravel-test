@@ -63,7 +63,7 @@ it('can destroy a user', function (): void {
 it('can delete a user', function (): void {
     $user = User::factory()->trashed()->create();
     $this->assertDatabaseCount('users', 1);
-    $data = app(IUserService::class)->delete($user->id);
+    app(IUserService::class)->delete($user->id);
     $this->assertDatabaseCount('users', 0);
 });
 

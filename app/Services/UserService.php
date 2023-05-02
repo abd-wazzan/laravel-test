@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserService implements IUserService
@@ -94,7 +95,16 @@ class UserService implements IUserService
 
     public function delete(int $id): bool
     {
-        return $this->user->newQuery()->onlyTrashed()->where(['id' => $id])->forceDelete();
+        try {
+            DB::beginTransaction();
+            $this->detail->where(['user_id' => $id])->forceDelete();
+            $this->user->newQuery()->onlyTrashed()->where(['id' => $id])->forceDelete();
+            DB::commit();
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return false;
+        }
+        return true;
     }
 
     public function restore(int $id): bool
