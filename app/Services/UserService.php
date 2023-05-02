@@ -85,7 +85,7 @@ class UserService implements IUserService
 
     public function find(int $id): ?User
     {
-        return $this->user->newQuery()->find($id);
+        return $this->user->newQuery()->findOrFail($id);
     }
 
     public function destroy(int $id): bool
