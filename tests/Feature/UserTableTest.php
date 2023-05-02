@@ -1,27 +1,33 @@
 <?php
 
-use App\Models\User;
+use Illuminate\Support\Facades\Schema;
 
 it('can create a user table', function (): void {
-
-    $userDefinition = User::factory()->definition();
-    $this->actingAs(User::factory()->create());
-    $this->assertAuthenticated('web');
-    $data = [
-        'prefixname' => $userDefinition['prefixname'],
-        'firstname' => $userDefinition['firstname'],
-        'middlename' => $userDefinition['middlename'],
-        'lastname' => $userDefinition['lastname'],
-        'suffixname' => $userDefinition['suffixname'],
-        'email' => $userDefinition['email'],
-        'password' => 'password',
-        'password_confirmation' => 'password',
-        'type' => $userDefinition['type'],
+    $table = 'users';
+    expect(Schema::hasTable($table))->toBeTrue();
+    $columns = [
+        'prefixname' => 'string',
+        'firstname' => 'string',
+        'middlename' => 'string',
+        'lastname' => 'string',
+        'suffixname' => 'string',
+        'username' => 'string',
+        'email' => 'string',
+        'password' => 'text',
+        'photo' => 'text',
+        'type' => 'string',
+        'remember_token' => 'string',
+        'email_verified_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime'
     ];
-    $this->assertDatabaseCount('users', 1);
-    $this->post(route('users.store'), $data)->assertStatus(302);
-    $this->assertDatabaseHas('users', ['email' => $userDefinition['email']]);
-    $this->assertDatabaseCount('users', 2);
+
+    expect(Schema::hasColumns($table, array_keys($columns)))->toBeTrue();
+
+    foreach ($columns as $column => $type) {
+        expect(Schema::getColumnType($table, $column))->toBe($type);
+    }
 });
 
 
