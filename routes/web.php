@@ -18,12 +18,5 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
-Route::prefix('users')->middleware('auth:web')
-    ->controller(UserController::class)
-    ->group(function () {
-        Route::get('trashed', 'trashed')->name('users.trashed');
-        Route::patch('{user}/restore', 'restore')->name('users.restore');
-        Route::delete('{user}/delete', 'delete')->name('users.delete');
-    });
-Route::resource('users', UserController::class)
-    ->middleware('auth:web');
+Route::softDeletes('users', UserController::class)->middleware('auth:web');
+Route::resource('users', UserController::class)->middleware('auth:web');
