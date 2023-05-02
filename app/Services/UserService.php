@@ -3,16 +3,20 @@
 namespace App\Services;
 
 use App\DataTransferObjects\UserData;
+use App\Models\Detail;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 
 class UserService implements IUserService
 {
     public function __construct(
-        protected User $user
-    ) {
+        protected User $user,
+        protected Detail $detail
+    )
+    {
     }
 
     public function list(int $count = 15): LengthAwarePaginator
@@ -46,23 +50,36 @@ class UserService implements IUserService
         )->toArray());
     }
 
-    public function update(UserData $data): bool
+    public function hash(string $key): string
+    {
+        if (Hash::needsRehash($key)) {
+            $key = Hash::make($key);
+        }
+        return $key;
+    }
+
+    public function upload(UploadedFile $file): string
+    {
+        return $file->store('public/images');
+    }
+
+    public function update(UserData $data): User
     {
         if ($data->photo_file?->isFile()) {
             $data->photo = $this->upload($data->photo_file);
         }
 
-        return (bool) $this->user->newQuery()->where(['id' => $data->id])
-            ->update($data->only(
-            'prefixname',
-            'firstname',
-            'middlename',
-            'lastname',
-            'suffixname',
-            'email',
-            'type',
-            'photo'
-        )->toArray());
+        return tap($this->user->newQuery()->find($data->id))
+            ->updateByArray($data->only(
+                'prefixname',
+                'firstname',
+                'middlename',
+                'lastname',
+                'suffixname',
+                'email',
+                'type',
+                'photo'
+            )->toArray());
     }
 
     public function find(int $id): ?User
@@ -85,16 +102,13 @@ class UserService implements IUserService
         return $this->user->newQuery()->onlyTrashed()->where(['id' => $id])->restore();
     }
 
-    public function upload(UploadedFile $file): string
+    public function saveDetails(User $user): Collection
     {
-        return $file->store('public/images');
-    }
-
-    public function hash(string $key): string
-    {
-        if (Hash::needsRehash($key)) {
-            $key = Hash::make($key);
-        }
-        return $key;
+        return $user->details()->createMany([
+            ['key' => 'Full name', 'value' => $user->fullname, 'type' => 'bio'],
+            ['key' => 'Middle Initial', 'value' => $user->middleinitial, 'type' => 'bio'],
+            ['key' => 'Avatar', 'value' => $user->avatar, 'type' => 'bio'],
+            ['key' => 'Gender', 'value' => $user->gender, 'type' => 'bio'],
+        ]);
     }
 }

@@ -64,8 +64,8 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        $this->userService->update(UserData::fromRequest($request));
-        return redirect()->action([self::class, 'show'], $user->fresh());
+        $updatedUser = $this->userService->update(UserData::fromRequest($request));
+        return redirect()->action([self::class, 'show'], $updatedUser);
     }
 
     /**

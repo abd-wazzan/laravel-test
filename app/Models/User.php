@@ -8,11 +8,13 @@ use App\Enums\UserTypeEnum;
 use App\Observers\UserObserver;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -94,7 +96,14 @@ class User extends Authenticatable
     protected function avatar(): Attribute
     {
         return Attribute::make(
-            get: fn () => Storage::url($this->photo)
+            get: fn () => URL::to('/') . Storage::url($this->photo)
+        );
+    }
+
+    protected function gender(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->prefixname->getGender()
         );
     }
 
@@ -111,5 +120,18 @@ class User extends Authenticatable
         return $this->query()
             ->where('username', 'like', strtolower($name) . '\_%')
             ->count();
+    }
+
+    public function details(): HasMany
+    {
+        return $this->hasMany(Detail::class);
+    }
+
+    public function updateByArray(array $data): void
+    {
+        foreach ($data as $attribute => $value) {
+            $this->setAttribute($attribute, $value);
+        }
+        $this->save();
     }
 }

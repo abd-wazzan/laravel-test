@@ -11,4 +11,14 @@ enum UserPrefixnameEnum: string
     case MRS = 'Mrs';
     case MS = 'Ms';
 
+    public function getGender(): string
+    {
+        return match($this)
+        {
+            UserPrefixnameEnum::MR => 'Male',
+            UserPrefixnameEnum::MRS => 'Female',
+            UserPrefixnameEnum::MS => 'Female',
+        };
+    }
+
 }

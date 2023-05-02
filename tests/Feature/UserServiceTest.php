@@ -23,6 +23,7 @@ it('can create a user', function (): void {
 });
 
 it('can update a user', function (): void {
+    try {
         $user = User::factory()->create();
         $userDefinition = User::factory()->definition();
         $updatedData = [
@@ -34,6 +35,7 @@ it('can update a user', function (): void {
         app(IUserService::class)->update(UserData::from($userData));
         $this->assertDatabaseHas('users', ['id' => $user->id, 'email' => $userDefinition['email']]);
         $this->assertDatabaseCount('users', 1);
+    }catch (Exception $e) {dd($e->getMessage());}
 });
 
 it('can list the users', function (): void {
