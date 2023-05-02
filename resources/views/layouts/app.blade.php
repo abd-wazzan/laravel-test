@@ -30,7 +30,7 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
-
+                        <a href="{{ route('users.index') }}" class="btn btn-primary btn-sm">Manage Users</a>
                     </ul>
 
                     <!-- Right Side Of Navbar -->
@@ -67,6 +67,15 @@
         </nav>
 
         <main class="py-4">
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             @yield('content')
         </main>
     </div>

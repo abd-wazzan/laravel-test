@@ -26,6 +26,17 @@ class DatabaseSeeder extends Seeder
              'type' => UserTypeEnum::USER
          ]);
 
+        \App\Models\User::create([
+            'prefixname' => UserPrefixnameEnum::MR,
+            'firstname' => 'Sami',
+            'middlename' => 'John',
+            'lastname' => 'Smith',
+            'suffixname' => 'DD',
+            'email' => 'test@example.com',
+            'password' => 'password',
+            'type' => UserTypeEnum::USER
+        ]);
+
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
