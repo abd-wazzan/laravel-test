@@ -3,6 +3,8 @@
 use App\DataTransferObjects\UserData;
 use App\Models\User;
 use App\Services\IUserService;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 it('can create a user', function (): void {
 
@@ -23,26 +25,24 @@ it('can create a user', function (): void {
 });
 
 it('can update a user', function (): void {
-    try {
-        $user = User::factory()->create();
-        $userDefinition = User::factory()->definition();
-        $updatedData = [
-            'firstname' => $userDefinition['firstname'],
-            'lastname' => $userDefinition['lastname'],
-            'email' => $userDefinition['email'],
-        ];
-        $userData = array_merge($user->toArray(), $updatedData);
-        app(IUserService::class)->update(UserData::from($userData));
-        $this->assertDatabaseHas('users', ['id' => $user->id, 'email' => $userDefinition['email']]);
-        $this->assertDatabaseCount('users', 1);
-    }catch (Exception $e) {dd($e->getMessage());}
+    $user = User::factory()->create();
+    $userDefinition = User::factory()->definition();
+    $updatedData = [
+        'firstname' => $userDefinition['firstname'],
+        'lastname' => $userDefinition['lastname'],
+        'email' => $userDefinition['email'],
+    ];
+    $userData = array_merge($user->toArray(), $updatedData);
+    app(IUserService::class)->update(UserData::from($userData));
+    $this->assertDatabaseHas('users', ['id' => $user->id, 'email' => $userDefinition['email']]);
+    $this->assertDatabaseCount('users', 1);
 });
 
 it('can list the users', function (): void {
-        User::factory()->count(20)->create();
-        $this->assertDatabaseCount('users', 20);
-        $data = app(IUserService::class)->list(25);
-        expect(count($data->items()))->toBe(20);
+    User::factory()->count(20)->create();
+    $this->assertDatabaseCount('users', 20);
+    $data = app(IUserService::class)->list(25);
+    expect(count($data->items()))->toBe(20);
 });
 
 it('can list the trashed users', function (): void {
@@ -84,7 +84,7 @@ it('can find a user', function (): void {
 });
 
 it('can upload file', function (): void {
-    $file = \Illuminate\Http\UploadedFile::fake()->create('img.png', 200);
+    $file = UploadedFile::fake()->create('img.png', 200);
     $file = app(IUserService::class)->upload($file);
-    \Illuminate\Support\Facades\Storage::assertExists($file);
+    Storage::assertExists($file);
 });
