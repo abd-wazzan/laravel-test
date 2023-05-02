@@ -76,7 +76,7 @@
                 <div class="row mb-4">
                     <label class="col-sm-2 col-label-form">Image</label>
                     <div class="col-sm-10">
-                        <input type="file" accept=".png,.jpeg,.jpg" name="photo"/>
+                        <input type="file" accept=".png,.jpeg,.jpg" name="photo_file"/>
                     </div>
                 </div>
                 <div class="text-center">

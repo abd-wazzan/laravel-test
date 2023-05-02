@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\DataTransferObjects\UserData;
 use App\Http\Requests\User\CreateUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
+use App\Services\IUserService;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
     public function __construct(
-        protected User $user
+        protected IUserService $userService
     ) {
     }
     /**
@@ -18,7 +20,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $data = $this->user->newQuery()->paginate();
+        $data = $this->userService->list();
         return view('users.index', compact('data'));
     }
 
@@ -35,11 +37,7 @@ class UserController extends Controller
      */
     public function store(CreateUserRequest $request)
     {
-        $data = $request->validated();
-        if ($request->hasFile('photo')) {
-            $data['photo'] = $request->file('photo')->store('public/images');
-        }
-        $user = $this->user->newQuery()->create($data);
+        $user = $this->userService->store(UserData::fromRequest($request));
         return redirect()->action([self::class, 'show'], $user);
     }
 
@@ -64,12 +62,8 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        $data = $request->validated();
-        if ($request->hasFile('photo')) {
-            $data['photo'] = $request->file('photo')->store('public/images');
-        }
-        $user->update($data);
-        return redirect()->action([self::class, 'show'], $user);
+        $this->userService->update(UserData::fromRequest($request));
+        return redirect()->action([self::class, 'show'], $user->fresh());
     }
 
     /**
@@ -77,27 +71,25 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        $user->delete();
-        return redirect(route('users.index'));
-    }
-
-    public function delete(string $id)
-    {
-        $user= $this->user->newQuery()->onlyTrashed()->findOrFail($id);
-        $user->forceDelete();
-        return redirect(route('users.trashed'));
+        return $this->userService->destroy($user->id) ? redirect()->route('users.index') :
+            redirect()->route('users.index')->withErrors('Operation Failed!');
     }
 
     public function trashed()
     {
-        $data = $this->user->newQuery()->onlyTrashed()->paginate();
+        $data = $this->userService->listTrashed();
         return view('users.trashed', compact('data'));
+    }
+
+    public function delete(string $id)
+    {
+        return $this->userService->delete($id) ? redirect()->route('users.trashed') :
+            back()->withErrors('Operation Failed!');
     }
 
     public function restore(string $id)
     {
-        $user= $this->user->newQuery()->onlyTrashed()->findOrFail($id);
-        $user->restore();
-        return redirect()->action([self::class, 'show'], $user);
+        return $this->userService->restore($id) ? redirect()->route('users.show', $id) :
+            back()->withErrors('Operation Failed!');
     }
 }

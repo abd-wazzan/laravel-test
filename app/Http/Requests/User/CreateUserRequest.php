@@ -19,7 +19,7 @@ class CreateUserRequest extends FormRequest
             'suffixname' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')],
             'password' => ['required', 'string', 'min:8', 'max:16', 'confirmed'],
-            'photo' => ['nullable', 'image', 'max:2048'],
+            'photo_file' => ['nullable', 'image', 'max:2048'],
             'type' => ['required', Rule::in(UserTypeEnum::getValues())],
         ];
     }
