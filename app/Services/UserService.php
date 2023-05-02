@@ -15,14 +15,14 @@ class UserService implements IUserService
     ) {
     }
 
-    public function list(): LengthAwarePaginator
+    public function list(int $count = 15): LengthAwarePaginator
     {
-        return $this->user->newQuery()->paginate();
+        return $this->user->newQuery()->paginate($count);
     }
 
-    public function listTrashed(): LengthAwarePaginator
+    public function listTrashed(int $count = 15): LengthAwarePaginator
     {
-        return $this->user->newQuery()->onlyTrashed()->paginate();
+        return $this->user->newQuery()->onlyTrashed()->paginate($count);
     }
 
     public function store(UserData $data): User
@@ -65,14 +65,11 @@ class UserService implements IUserService
         )->toArray());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function find(int $id): ?User
+    {
+        return $this->user->newQuery()->find($id);
+    }
 
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(int $id): bool
     {
         return $this->user->newQuery()->where(['id' => $id])->delete();

@@ -44,9 +44,11 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
+    public function show(string $id)
     {
-        return view('users.show', compact('user'));
+        $user = $this->userService->find($id);
+        return $user ? view('users.show', compact('user')) :
+            back()->withErrors('User Not Found!');
     }
 
     /**
