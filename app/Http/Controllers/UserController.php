@@ -39,8 +39,8 @@ class UserController extends Controller
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('public/images');
         }
-        $createdUser = $this->user->newQuery()->create($data);
-        redirect(route('users.show', $createdUser->id));
+        $user = $this->user->newQuery()->create($data);
+        return redirect()->action([self::class, 'show'], $user);
     }
 
     /**
@@ -69,7 +69,7 @@ class UserController extends Controller
             $data['photo'] = $request->file('photo')->store('public/images');
         }
         $user->update($data);
-        return redirect(route('users.show', $user->id));
+        return redirect()->action([self::class, 'show'], $user);
     }
 
     /**
@@ -79,5 +79,25 @@ class UserController extends Controller
     {
         $user->delete();
         return redirect(route('users.index'));
+    }
+
+    public function delete(string $id)
+    {
+        $user= $this->user->newQuery()->onlyTrashed()->findOrFail($id);
+        $user->forceDelete();
+        return redirect(route('users.trashed'));
+    }
+
+    public function trashed()
+    {
+        $data = $this->user->newQuery()->onlyTrashed()->paginate();
+        return view('users.trashed', compact('data'));
+    }
+
+    public function restore(string $id)
+    {
+        $user= $this->user->newQuery()->onlyTrashed()->findOrFail($id);
+        $user->restore();
+        return redirect()->action([self::class, 'show'], $user);
     }
 }

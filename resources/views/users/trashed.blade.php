@@ -12,10 +12,9 @@
     <div class="card">
         <div class="card-header">
             <div class="row">
-                <div class="col col-md-6"><b>User Data</b></div>
+                <div class="col col-md-6"><b>Trashed User Data</b></div>
                 <div class="col col-md-6">
-                    <a href="{{ route('users.create') }}" class="btn btn-success btn-sm float-end mx-1">Add</a>
-                    <a href="{{ route('users.trashed') }}" class="btn btn-danger btn-sm float-end mx-1">Trashed</a>
+                    <a href="{{ route('users.index') }}" class="btn btn-success btn-sm float-end mx-1">Un-trashed</a>
                 </div>
             </div>
         </div>
@@ -46,17 +45,16 @@
                             <td>{{ $row->email }}</td>
                             <td>{{ $row->type }}</td>
                             <td>
-                                <div>
-                                    <a href="{{ route('users.show', $row->id) }}"
-                                       class="btn btn-primary btn-sm my-1">View</a>
-                                    <a href="{{ route('users.edit', $row->id) }}"
-                                       class="btn btn-warning btn-sm my-1">Edit</a>
-                                    <form method="post" action="{{ route('users.destroy', $row->id) }}">
-                                        @csrf
-                                        @method('DELETE')
-                                        <input type="submit" class="btn btn-danger btn-sm" value="Delete"/>
-                                    </form>
-                                </div>
+                                <form method="post" action="{{ route('users.restore', $row->id) }}">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="submit" class="btn btn-success btn-sm  my-1" value="Restore"/>
+                                </form>
+                                <form method="post" action="{{ route('users.delete', $row->id) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <input type="submit" class="btn btn-danger btn-sm  my-1" value="Delete"/>
+                                </form>
                             </td>
                         </tr>
                     @endforeach

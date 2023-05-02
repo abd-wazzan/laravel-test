@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,5 +18,12 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
-
-Route::resource('users', \App\Http\Controllers\UserController::class)->middleware('auth:web');
+Route::prefix('users')->middleware('auth:web')
+    ->controller(UserController::class)
+    ->group(function () {
+        Route::get('trashed', 'trashed')->name('users.trashed');
+        Route::patch('{user}/restore', 'restore')->name('users.restore');
+        Route::delete('{user}/delete', 'delete')->name('users.delete');
+    });
+Route::resource('users', UserController::class)
+    ->middleware('auth:web');
