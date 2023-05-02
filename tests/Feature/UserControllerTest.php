@@ -21,9 +21,11 @@ it('can create a user', function (): void {
         'type' => $userDefinition['type'],
     ];
     $this->assertDatabaseCount('users', 1);
+    $this->assertDatabaseCount('details', 4);
     $this->post(route('users.store'), $data)->assertStatus(302);
     $this->assertDatabaseHas('users', ['email' => $userDefinition['email']]);
     $this->assertDatabaseCount('users', 2);
+    $this->assertDatabaseCount('details', 8);
 });
 
 it('can update a user', function (): void {
@@ -69,24 +71,24 @@ it('can delete a user', function (): void {
 
 it('can list the users', function (): void {
     User::factory()->count(20)->create();
-    $this->get(route('users.index'))->assertStatus(200);
+    $this->get(route('users.index'))->assertSuccessful();
 });
 
 it('can list trashed the users', function (): void {
     User::factory()->count(20)->trashed()->create();
-    $this->get(route('users.trashed'))->assertStatus(200);
+    $this->get(route('users.trashed'))->assertSuccessful();
 });
 
 it('can show a user', function (): void {
     $createdUser = User::factory()->create();
-    $this->get(route('users.show', $createdUser->id))->assertStatus(200);
+    $this->get(route('users.show', $createdUser->id))->assertSuccessful();
 });
 
 it('can show create user page', function (): void {
-    $this->get(route('users.create'))->assertStatus(200);
+    $this->get(route('users.create'))->assertSuccessful();
 });
 
 it('can show update user page', function (): void {
     $createdUser = User::factory()->create();
-    $this->get(route('users.update', $createdUser->id))->assertStatus(200);
+    $this->get(route('users.update', $createdUser->id))->assertSuccessful();
 });

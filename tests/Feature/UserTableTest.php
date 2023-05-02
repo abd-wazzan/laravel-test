@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Schema;
 
-it('can create a user table', function (): void {
+test('test user table schema', function (): void {
     $table = 'users';
     expect(Schema::hasTable($table))->toBeTrue();
     $columns = [
